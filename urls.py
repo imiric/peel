@@ -7,4 +7,5 @@ dbindexer.autodiscover()
 
 urlpatterns = patterns('',
     ('^admin/', include(admin.site.urls)),
+    ('', include('peel.urls')),
 )
