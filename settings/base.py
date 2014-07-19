@@ -20,6 +20,7 @@ INSTALLED_APPS = (
     'autoload',
     'dbindexer',
     'djangoappengine',
+    'peel',
 )
 
 MIDDLEWARE_CLASSES = (
