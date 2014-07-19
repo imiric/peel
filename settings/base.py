@@ -38,7 +38,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
-STATIC_ROOT = os.path.join(BASE_DIR, 'public')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'templates'),)
 
 TEST_RUNNER = 'djangotoolbox.test.CapturingTestSuiteRunner'

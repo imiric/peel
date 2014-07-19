@@ -1,3 +1,3 @@
 from .base import *
 
-STATIC_URL = '/static_dev/'
+STATIC_URL = '/static/'
