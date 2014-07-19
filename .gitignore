@@ -1,0 +1,11 @@
+.DS_Store
+*.pyc
+.gaedata
+
+/public
+
+/django
+/djangotoolbox
+/djangoappengine
+/dbindexer
+/autoload

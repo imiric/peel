@@ -1,0 +1,9 @@
+web:
+  build: .
+  volumes:
+    - .:/code
+  ports:
+    - 127.0.0.1:5000:5000
+  command: ./manage.py runserver 0.0.0.0:5000
+  environment:
+    LANG: en_GB.UTF-8
