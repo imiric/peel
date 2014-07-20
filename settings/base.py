@@ -20,6 +20,7 @@ INSTALLED_APPS = (
     'autoload',
     'dbindexer',
     'djangoappengine',
+    'tastypie',
     'peel',
 )
 

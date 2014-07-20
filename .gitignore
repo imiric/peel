@@ -8,8 +8,13 @@ node_modules/
 .sass-cache/
 bower_components/
 
-django
-djangotoolbox
-djangoappengine
-dbindexer
+# GAE dependencies
 autoload
+dateutil
+dbindexer
+django
+djangoappengine
+djangotoolbox
+tastypie
+mimeparse.py
+six.py
