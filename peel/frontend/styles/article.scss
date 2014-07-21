@@ -2,6 +2,7 @@
 
 .article {
     margin-bottom: 50px;
+    position: relative;
 
     .title {
         border-bottom: 1px solid #e5e5e5;
@@ -19,20 +20,64 @@
     }
 
     .tags {
-        margin-left: 5px;
         list-style: none;
-        padding: 5px;
         display: inline;
-        font-size: 65%;
-    }
+        font-size: 12px;
+        position: absolute;
+        padding-left: 10px;
+        padding-top: 5px;
+        margin-bottom: 0;
 
-    .tags li, .tags a {
-        height: 24px;
-        line-height: 24px;
-        position: relative;
-        font-size: 90%;
-        display: inline;
-        margin-right: 5px;
+        li, a {
+            position: relative;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        a {
+            margin-left: 10px;
+            padding: 2px 5px 3px 6px;
+            background: #428bca;
+            color: #fff;
+            text-decoration: none;
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+
+            // The left triangle
+            &:before {
+                content: "";
+                float: left;
+                position: absolute;
+                top: 0;
+                left: -11.5px;
+                width: 0;
+                height: 0;
+                border-color: transparent #428bca transparent transparent;
+                border-style: solid;
+                border-width: 9.5px 12px 9.5px 0;
+            }
+
+            // The inner dot
+            &:after {
+                content: "";
+                position: absolute;
+                top: 8px;
+                left: -2px;
+                float: left;
+                width: 3px;
+                height: 3px;
+                border-radius: 2px;
+                background: #fff;
+                box-shadow: -1px -1px 2px #004977;
+            }
+
+            &:hover {
+                background: #2a6496;
+                &:before {
+                    border-color: transparent #2a6496 transparent transparent;
+                }
+            }
+        }
     }
 }
 
