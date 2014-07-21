@@ -4,9 +4,14 @@
   "dependencies": {
     "bootstrap-sass-official": "~3.2.0",
     "bourbon": "~4.0.1",
-    "jquery": "~2.1.0",
+    "hallo": "~1.0.4",
+    "jquery": "~2.1.1",
+    "jqueryui": "~1.11.0",
     "modernizr": "~2.8.3",
+    "rangy": "~1.2.3",
     "react": "~0.11.0"
+  },
+  "resolutions": {
+    "jquery": "~2.1.1"
   }
 }
-

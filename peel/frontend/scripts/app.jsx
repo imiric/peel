@@ -1,5 +1,34 @@
 /** @jsx React.DOM */
 
+var EventHandlerMixin = {
+  onBlur: function(event) {
+    $(this.getDOMNode()).hallo({editable: false});
+  },
+  onMouseDown: function(event) {
+    if (event.ctrlKey) {
+      $(this.getDOMNode()).hallo({editable: true});
+    }
+  }
+};
+
+var ArticleTitle = React.createClass({
+  mixins: [EventHandlerMixin],
+  render: function() {
+    return (
+      <span onBlur={this.onBlur} onMouseDown={this.onMouseDown}>{this.props.title}</span>
+    );
+  }
+})
+
+var ArticleBody = React.createClass({
+  mixins: [EventHandlerMixin],
+  render: function() {
+    return (
+      <p className="article-body" onBlur={this.onBlur} onMouseDown={this.onMouseDown}>{this.props.content}</p>
+    );
+  }
+});
+
 var Article = React.createClass({
   render: function() {
     var tags = [];
@@ -9,8 +38,8 @@ var Article = React.createClass({
     return (
       <div className="article">
         <div className="date pull-right">{this.props.created_at}</div>
-        <h3 className="title"><span>{this.props.title}</span><ul className="tags">{tags}</ul></h3>
-        <p className="article-body">{this.props.content}</p>
+        <h3 className="title"><ArticleTitle title={this.props.title} /><ul className="tags">{tags}</ul></h3>
+        <ArticleBody content={this.props.content} />
       </div>
     );
   }
