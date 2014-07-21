@@ -9,8 +9,8 @@ var Article = React.createClass({displayName: 'Article',
     return (
       React.DOM.div( {className:"article"}, 
         React.DOM.div( {className:"date pull-right"}, this.props.created_at),
-        React.DOM.h3( {className:"title"}, React.DOM.span( {className:"highlight"}, this.props.title),React.DOM.ul( {className:"tags"}, tags)),
-        React.DOM.p( {className:"article-body"}, React.DOM.span( {className:"highlight"}, this.props.content))
+        React.DOM.h3( {className:"title"}, React.DOM.span(null, this.props.title),React.DOM.ul( {className:"tags"}, tags)),
+        React.DOM.p( {className:"article-body"}, this.props.content)
       )
     );
   }

@@ -9,8 +9,8 @@ var Article = React.createClass({
     return (
       <div className="article">
         <div className="date pull-right">{this.props.created_at}</div>
-        <h3 className="title"><span className="highlight">{this.props.title}</span><ul className="tags">{tags}</ul></h3>
-        <p className="article-body"><span className="highlight">{this.props.content}</span></p>
+        <h3 className="title"><span>{this.props.title}</span><ul className="tags">{tags}</ul></h3>
+        <p className="article-body">{this.props.content}</p>
       </div>
     );
   }

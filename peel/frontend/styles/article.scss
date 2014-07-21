@@ -1,28 +1,26 @@
 @import "bourbon/dist/_bourbon";
 
-.highlight {
-    @include transition (background-color 0.25s ease-in-out);
-    padding: 5px;
-    border-radius: 5px;
-    &:hover {
-        background-color: #eee;
-    }
-}
-
 .article {
     margin-bottom: 50px;
 
     .title {
         border-bottom: 1px solid #e5e5e5;
+        > span {
+            padding: 5px;
+        }
     }
 
     .date {
         padding: 5px;
     }
 
+    .content {
+        padding: 5px;
+    }
+
     .tags {
-        margin-bottom: 5px;
-        list-style:none;
+        margin-left: 5px;
+        list-style: none;
         padding: 5px;
         display: inline;
         font-size: 65%;
