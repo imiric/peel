@@ -26,7 +26,8 @@ gulp.task('styles', function () {
     .pipe($.rubySass({
       style: 'compressed',
       // An absolute path is needed for sass to locate the dependencies
-      loadPath: path.join(__dirname, bases.app, 'bower_components')
+      loadPath: [path.join(__dirname, bases.styles),
+                 path.join(__dirname, bases.app, 'bower_components')]
     }))
     .pipe($.autoprefixer('last 1 version'))
     .pipe($.chmod(644))

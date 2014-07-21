@@ -4,14 +4,13 @@ var Article = React.createClass({
   render: function() {
     var tags = [];
     this.props.tags.forEach(function(tag) {
-      tags.push(<span className="badge">{tag}</span>);
+      tags.push(<li><a href="#">{tag}</a></li>);
     });
     return (
       <div className="article">
-        <h3 className="title">{this.props.title}</h3>
-        <div className="tags">{tags}</div>
-        <div className="date">{this.props.created_at}</div>
-        <p className="article-body">{this.props.content}</p>
+        <div className="date pull-right">{this.props.created_at}</div>
+        <h3 className="title"><span className="highlight">{this.props.title}</span><ul className="tags">{tags}</ul></h3>
+        <p className="article-body"><span className="highlight">{this.props.content}</span></p>
       </div>
     );
   }
@@ -44,4 +43,4 @@ var ArticleList = React.createClass({
   }
 });
 
-React.renderComponent(<ArticleList source="/api/v1/article/" />, document.getElementById("content"));
+React.renderComponent(<ArticleList source="/api/v1/article/" />, document.getElementById("articles"));
