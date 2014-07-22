@@ -89,7 +89,7 @@ gulp.task('clean', function () {
 });
 
 // Build
-gulp.task('build', ['styles', 'scripts', 'html', 'images'], function(){
+gulp.task('build', ['styles', 'jsx', 'scripts', 'html', 'images'], function(){
   return gulp.src(path.join(bases.app, '*.html'))
     .pipe($.useref.assets())
     .pipe($.if('*.js', $.uglify()))
