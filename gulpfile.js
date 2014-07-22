@@ -2,7 +2,8 @@
 
 var gulp = require('gulp'),
     path = require('path'),
-    _ = require('lodash');
+    _ = require('lodash'),
+    bowerFiles = require('main-bower-files');
 
 // Load plugins
 var $ = require('gulp-load-plugins')();
@@ -17,17 +18,18 @@ var bases = {
 _.extend(bases, {
   scripts: path.join(bases.app, 'scripts'),
   styles: path.join(bases.app, 'styles'),
-  images: path.join(bases.app, 'images')
+  images: path.join(bases.app, 'images'),
+  bower: path.join(bases.app, 'bower_components')
 });
 
 // Styles
-gulp.task('styles', function () {
+gulp.task('styles', function() {
   return gulp.src(path.join(bases.styles, 'main.scss'))
     .pipe($.rubySass({
       style: 'compressed',
       // An absolute path is needed for sass to locate the dependencies
       loadPath: [path.join(__dirname, bases.styles),
-                 path.join(__dirname, bases.app, 'bower_components')]
+                 path.join(__dirname, bases.bower)]
     }))
     .pipe($.autoprefixer('last 1 version'))
     .pipe($.chmod(644))
@@ -36,28 +38,43 @@ gulp.task('styles', function () {
 });
 
 // Scripts
-gulp.task('scripts', function () {
+gulp.task('browserify:app', function() {
   return gulp.src(path.join(bases.scripts, 'app.js'))
+    .pipe($.browserify({
+      insertGlobals: true,
+      transform: ['reactify', 'debowerify', 'deglobalify']
+    }))
     .pipe($.jshint('.jshintrc'))
     .pipe($.jshint.reporter('default'))
-    .pipe($.browserify({
-      insertGlobals: true
-    }))
+    .pipe($.uglify())
     .pipe($.chmod(644))
     .pipe(gulp.dest(path.join(bases.static, 'scripts')))
     .pipe($.size());
 });
 
-// React precomiler
-gulp.task('jsx', function () {
-  return gulp.src(path.join(bases.scripts, '**/*.jsx'))
-    .pipe($.react())
-    .pipe(gulp.dest(bases.scripts))
-    .pipe($.size())
+gulp.task('browserify:vendor', function() {
+  return gulp.src(bowerFiles(), {base: bases.bower, read: false})
+    .pipe($.browserify({
+      insertGlobals: false,
+      shim: {
+        rangy: {
+            exports: "rangy",
+            init: function() { return this.rangy; },
+            path: path.join(bases.bower, 'rangy/rangy-core.js')
+        }
+      }
+    }))
+    .pipe($.concat('vendor.js'))
+    .pipe($.uglify())
+    .pipe($.chmod(644))
+    .pipe(gulp.dest(path.join(bases.static, 'scripts')))
+    .pipe($.size());
 });
 
+gulp.task('scripts', ['browserify:vendor', 'browserify:app']);
+
 // HTML
-gulp.task('html', function () {
+gulp.task('html', function() {
   return gulp.src(path.join(bases.app, '*.html'))
     .pipe($.useref())
     .pipe($.chmod(644))
@@ -66,7 +83,7 @@ gulp.task('html', function () {
 });
 
 // Images
-gulp.task('images', function () {
+gulp.task('images', function() {
   return gulp.src(path.join(bases.images, '**/*'))
     .pipe($.cache(
       $.imagemin({
@@ -80,7 +97,7 @@ gulp.task('images', function () {
 });
 
 // Clean
-gulp.task('clean', function () {
+gulp.task('clean', function() {
   return gulp.src([path.join(bases.static, '*'), path.join(bases.templates, '*')], {read: false})
     .pipe($.rimraf({force: true}))
     .pipe($.print(function(filepath) {
@@ -89,16 +106,15 @@ gulp.task('clean', function () {
 });
 
 // Build
-gulp.task('build', ['styles', 'jsx', 'scripts', 'html', 'images'], function(){
+gulp.task('build', ['styles', 'scripts', 'html', 'images'], function() {
   return gulp.src(path.join(bases.app, '*.html'))
     .pipe($.useref.assets())
-    .pipe($.if('*.js', $.uglify()))
     .pipe($.chmod(644))
     .pipe(gulp.dest('.'));
 });
 
 // Default task
-gulp.task('default', ['clean'], function () {
+gulp.task('default', ['clean'], function() {
     gulp.start('build');
 });
 
@@ -108,7 +124,7 @@ gulp.task('json', function() {
 });
 
 // Watch
-gulp.task('watch', ['build'], function () {
+gulp.task('watch', function() {
   // Watch .json files
   gulp.watch(path.join(bases.scripts, '**/*.json'), ['json']);
 
@@ -118,11 +134,8 @@ gulp.task('watch', ['build'], function () {
   // Watch .scss files
   gulp.watch(path.join(bases.styles, '**/*.scss'), ['styles']);
 
-  // Watch .jsx files
-  gulp.watch(path.join(bases.scripts, '**/*.jsx'), ['jsx']);
-
   // Watch .js files
-  gulp.watch(path.join(bases.scripts, '**/*.js'), ['scripts']);
+  gulp.watch(path.join(bases.scripts, '**/*.js'), ['browserify:app']);
 
   // Watch image files
   gulp.watch(path.join(bases.images, '**/*'), ['images']);

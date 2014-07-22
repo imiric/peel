@@ -8,21 +8,25 @@
     "gulp-bower": "0.0.6",
     "gulp-browserify": "~0.5.0",
     "gulp-cache": "~0.2.0",
+    "gulp-chmod": "~0.2.1",
+    "gulp-concat": "~2.3.3",
     "gulp-if": "~1.2.2",
     "gulp-imagemin": "~0.6.1",
     "gulp-jshint": "~1.7.1",
     "gulp-load-plugins": "~0.5.3",
     "gulp-print": "~1.1.0",
-    "gulp-react": "~0.4.0",
     "gulp-rimraf": "~0.1.0",
     "gulp-ruby-sass": "~0.6.0",
     "gulp-size": "~0.4.0",
     "gulp-uglify": "~0.3.1",
     "gulp-useref": "~0.5.0",
     "gulp-util": "~3.0.0",
+    "concatenify": "0.0.2",
+    "debowerify": "~0.8.1",
+    "deglobalify": "~0.2.0",
     "lodash": "~2.4.1",
-    "reactify": "~0.14.0",
-    "gulp-chmod": "~0.2.1"
+    "main-bower-files": "~1.0.1",
+    "reactify": "~0.14.0"
   },
   "engines": {
     "node": ">=0.10.0"
