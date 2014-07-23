@@ -14,7 +14,6 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.contenttypes',
     'django.contrib.auth',
-    'django.contrib.staticfiles',
     'django.contrib.sessions',
     'djangotoolbox',
     'autoload',
@@ -38,10 +37,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.media',
 )
 
-STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'templates'),)
 
 TEST_RUNNER = 'djangotoolbox.test.CapturingTestSuiteRunner'
 ROOT_URLCONF = 'urls'
-PRE_DEPLOY_COMMANDS = ('collectstatic',)
