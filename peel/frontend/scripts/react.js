@@ -57,7 +57,7 @@ var ArticleBody = React.createClass({
   mixins: [EventHandlerMixin],
   render: function() {
     return (
-      <p className="article-body" onBlur={this.onBlur} onMouseDown={this.onMouseDown}
+      <div className="article-body" onBlur={this.onBlur} onMouseDown={this.onMouseDown}
         dangerouslySetInnerHTML={{__html: this.state['content']}} />
     );
   }
