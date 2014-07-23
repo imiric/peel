@@ -12,6 +12,8 @@ for cmd in git hg; do
     command -v ${cmd} >/dev/null || { echo "sh: command not found: ${cmd}"; exit 1; }
 done
 
+# Upgrade pip to a version that supports --no-use-wheel
+pip --version | awk '{ gsub(/\./, ""); if ($2<154) print "pip install --upgrade pip" }' | bash
 # Download all packages to ./src (default)
 pip install --download "${DOWNLOAD_DIR}" --no-use-wheel -r requirements.txt
 
