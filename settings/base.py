@@ -9,6 +9,9 @@ DATABASES['default'] = {'ENGINE': 'dbindexer', 'TARGET': 'native'}
 AUTOLOAD_SITECONF = 'indexes'
 SECRET_KEY = '=r-$b*8hglm+858&9t043hlm6-&6-3d3vfc4((7yd0dbrakhvi'
 ALLOWED_HOSTS = []
+# XXX: For some reason this needs to be enabled, otherwise the GAE instance
+# fails with 400 Bad Request. Investigate why this happens...
+DEBUG = True
 
 INSTALLED_APPS = (
     'django.contrib.admin',
