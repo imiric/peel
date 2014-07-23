@@ -4,7 +4,9 @@
   "dependencies": {
     "bootstrap-sass-official": "~3.2.0",
     "bourbon": "~4.0.1",
-    "hallo": "~1.0.4"
+    "hallo": "~1.0.4",
+    "marked": "~0.3.2",
+    "to-markdown": "~0.0.2"
   },
   "overrides": {
     "bootstrap-sass-official": {
