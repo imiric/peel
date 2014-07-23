@@ -34,6 +34,17 @@ var EventHandlerMixin = {
 
 var ArticleTitle = React.createClass({
   mixins: [EventHandlerMixin],
+
+  componentDidMount: function() {
+    $(this.getDOMNode()).on('hallomodified', this.onHalloModified);
+  },
+
+  onHalloModified: function(event) {
+    var node = this.getDOMNode();
+    // TODO: Figure out a better workaround to avoid rich formatting.
+    node.innerHTML = node.innerText;
+  },
+
   render: function() {
     return (
       <span onBlur={this.onBlur} onMouseDown={this.onMouseDown}
