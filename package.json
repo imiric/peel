@@ -24,7 +24,6 @@
     "concatenify": "0.0.2",
     "debowerify": "~0.8.1",
     "deglobalify": "~0.2.0",
-    "he": "~0.4.1",
     "lodash": "~2.4.1",
     "main-bower-files": "~1.0.1",
     "reactify": "~0.14.0"

@@ -1,14 +1,10 @@
 /** @jsx React.DOM */
 
-var markdown = require('./markdown');
-
 var EventHandlerMixin = {
   getInitialState: function() {
     var state = {},
-        fn = this.props.fieldName,
-        md = this.props[fn];
-    state[fn+'-html'] = markdown.mdToHtml(md);
-    state[fn+'-md'] = md;
+        fn = this.props.fieldName;
+    state[fn] = this.props[fn];
     return state;
   },
 
@@ -17,18 +13,15 @@ var EventHandlerMixin = {
         fn = this.props.fieldName,
         data = {};
     $(node).hallo({editable: false});
-    // Send Markdown data
-    data[fn] = this.state[fn+'-md'];
+    data[fn] = this.state[fn];
     this.props.updateArticle(data, true);
   },
 
   onBlur: function(event) {
     var html = this.getDOMNode().innerHTML,
-        md = markdown.htmlToMd(html),
         fn = this.props.fieldName,
         state = {};
-    state[fn+'-md'] = md;
-    state[fn+'-html'] = html;
+    state[fn] = html;
     this.setState(state);
   },
 
@@ -44,7 +37,7 @@ var ArticleTitle = React.createClass({
   render: function() {
     return (
       <span onBlur={this.onBlur} onMouseDown={this.onMouseDown}
-        dangerouslySetInnerHTML={{__html: this.state['title-html']}} />
+        dangerouslySetInnerHTML={{__html: this.state['title']}} />
     );
   }
 })
@@ -54,7 +47,7 @@ var ArticleBody = React.createClass({
   render: function() {
     return (
       <p className="article-body" onBlur={this.onBlur} onMouseDown={this.onMouseDown}
-        dangerouslySetInnerHTML={{__html: this.state['content-html']}} />
+        dangerouslySetInnerHTML={{__html: this.state['content']}} />
     );
   }
 });
