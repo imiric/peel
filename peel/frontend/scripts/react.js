@@ -14,9 +14,11 @@ var EventHandlerMixin = {
     var html = this.getDOMNode().innerHTML,
         fn = this.props.fieldName,
         data = {};
-    $(this.getDOMNode()).hallo({editable: false});
-    data[fn] = html;
-    this.props.updateArticle(data, true);
+    if (html) {
+      $(this.getDOMNode()).hallo({editable: false});
+      data[fn] = html;
+      this.props.updateArticle(data, true);
+    }
   },
 
   onMouseDown: function(event) {
