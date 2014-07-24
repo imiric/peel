@@ -14,6 +14,9 @@
         > span {
             padding: 5px;
         }
+        .inner-title {
+            display: inline-block;
+        }
     }
 
     .date {
@@ -39,10 +42,16 @@
             margin-right: 5px;
         }
 
+        li.placeholder {
+            opacity: 0.5;
+        }
+
         a {
             margin-left: 10px;
             padding: 2px 5px 3px 6px;
             background: #428bca;
+            min-width: 10px;
+            min-height: 17px;
             color: #fff;
             text-decoration: none;
             border-top-right-radius: 4px;

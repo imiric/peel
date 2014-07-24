@@ -2,10 +2,17 @@
 
 var EventHandlerMixin = {
   componentDidMount: function() {
-    this.showPlaceholder();
+    var fn = this.props.fieldName;
+    if (!this.props[fn]) {
+      this.showPlaceholder();
+    }
+    $(this.getDOMNode()).on('update-data', this.updateData);
   },
 
   showPlaceholder: function() {
+    if (!this.isMounted()) {
+      return;
+    }
     var node = $(this.getDOMNode());
     node.hallo({placeholder: 'Add ' + this.props.fieldName});
     // Leave the content in editable mode, just disable it. Needed to show
@@ -14,50 +21,72 @@ var EventHandlerMixin = {
   },
 
   updateData: function() {
-    var html = this.getDOMNode().innerHTML,
+    var node = $(this.getDOMNode()),
+        value = node.html(),
         fn = this.props.fieldName,
         data = {};
-    if (html) {
-      data[fn] = html;
-      $(this.getDOMNode()).hallo({editable: false});
+    if (value) {
+      if (fn == 'tag') {
+        var tags = this.props.tags.slice(),
+            valExists = $.inArray(value, tags) > -1,
+            tagIdx = $.inArray(this.props.tag, tags);
+
+        if (valExists) {
+          // Don't add an already existing tag
+          if (this.props.tag) {
+            node.text(this.props.tag);
+          } else {
+            this.showPlaceholder();
+          }
+          return;
+        }
+
+        // Either update an existing tag or append a new one
+        tags.splice(tagIdx > -1 ? tagIdx : tags.length, tagIdx > -1 ? 1 : 0, value);
+        value = tags;
+        fn = 'tags';
+      }
+      data[fn] = value;
       this.props.updateArticle(data, true);
     } else {
       this.showPlaceholder();
     }
   },
 
-  onMouseDown: function(event) {
-    if (event.ctrlKey) {
-      $(this.getDOMNode()).hallo({editable: true});
+  onMouseDown: function(e) {
+    var fn = this.props.fieldName,
+        node = $(this.getDOMNode());
+    // Allow one-click edits for placeholder items and CTRL+Click for all others
+    if (e.ctrlKey || node.hasClass('inPlaceholderMode')) {
+      node.hallo({editable: true});
     }
   },
 };
 
-var ArticleTitle = React.createClass({
-  mixins: [EventHandlerMixin],
-
+var SafeInputMixin = {
   onKeyDown: function(e) {
     var node = $(this.getDOMNode());
     // Persist the data on Enter
     if (e.keyCode === 13) {
       if (node.text()) {
         node.hallo({editable: false});
-        this.updateData();
+        node.trigger('update-data');
       } else {
         return false;
       }
-    } else if (e.keyCode === 27) {
-      this.showPlaceholder();
     } else if (e.ctrlKey && $.inArray(e.keyCode, [66, 73, 85]) > -1) {
       // Ignore Hallo shortcuts (^B, ^I, ^U)
       e.stopPropagation();
       return false;
     }
   },
+};
 
+var ArticleTitle = React.createClass({
+  mixins: [EventHandlerMixin, SafeInputMixin],
   render: function() {
     return (
-      <span onBlur={this.onBlur} onMouseDown={this.onMouseDown}
+      <div className="inner-title" onBlur={this.onBlur} onMouseDown={this.onMouseDown}
         onKeyDown={this.onKeyDown} dangerouslySetInnerHTML={{__html: this.props.title}} />
     );
   }
@@ -82,6 +111,33 @@ var ArticleBody = React.createClass({
       <div className="article-body" onBlur={this.onBlur} onMouseDown={this.onMouseDown}
         onKeyDown={this.onKeyDown} dangerouslySetInnerHTML={{__html: this.props.body}} />
     );
+  }
+});
+
+var ArticleTag = React.createClass({
+  mixins: [EventHandlerMixin, SafeInputMixin],
+  render: function() {
+      return <div onMouseDown={this.onMouseDown} onKeyDown={this.onKeyDown}>
+                {this.props.tag}
+             </div>;
+  },
+});
+
+var ArticleTags = React.createClass({
+  render: function() {
+    var tags = this.props.tags.concat('');
+    tags = tags.map(function(tag) {
+      return (
+        <li key={tag ? tag : Math.random()} className={tag ? '' : 'placeholder'}>
+          <a href="#">
+            <ArticleTag tag={tag} updateArticle={this.props.updateArticle}
+                tags={this.props.tags} fieldName="tag"
+            />
+          </a>
+        </li>
+      );
+    }.bind(this));
+    return <ul className="tags">{tags}</ul>;
   }
 });
 
@@ -128,7 +184,7 @@ var Article = React.createClass({
         <div className="date pull-right" title={this.props.updated_at}>{this.props.created_at}</div>
         <h3 className="title">
           <ArticleTitle updateArticle={this.updateArticle} fieldName="title" title={this.props.title} />
-          <ul className="tags">{tags}</ul>
+          <ArticleTags updateArticle={this.updateArticle} fieldName="tags" tags={this.props.tags} />
         </h3>
         <ArticleBody updateArticle={this.updateArticle} fieldName="body" body={this.props.body} />
       </div>
