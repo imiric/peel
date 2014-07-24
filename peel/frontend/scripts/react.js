@@ -2,9 +2,12 @@
 
 var EventHandlerMixin = {
   componentDidMount: function() {
-    var node = $(this.getDOMNode()),
-        fn = this.props.fieldName;
-    node.hallo({placeholder: 'Add ' + fn});
+    this.showPlaceholder();
+  },
+
+  showPlaceholder: function() {
+    var node = $(this.getDOMNode());
+    node.hallo({placeholder: 'Add ' + this.props.fieldName});
     // Leave the content in editable mode, just disable it. Needed to show
     // the placeholder properly.
     node.data('IKS-hallo').disable();
@@ -15,9 +18,11 @@ var EventHandlerMixin = {
         fn = this.props.fieldName,
         data = {};
     if (html) {
-      $(this.getDOMNode()).hallo({editable: false});
       data[fn] = html;
+      $(this.getDOMNode()).hallo({editable: false});
       this.props.updateArticle(data, true);
+    } else {
+      this.showPlaceholder();
     }
   },
 
@@ -32,10 +37,17 @@ var ArticleTitle = React.createClass({
   mixins: [EventHandlerMixin],
 
   onKeyDown: function(e) {
+    var node = $(this.getDOMNode());
     // Persist the data on Enter
     if (e.keyCode === 13) {
-      $(this.getDOMNode()).hallo({editable: false});
-      this.updateData();
+      if (node.text()) {
+        node.hallo({editable: false});
+        this.updateData();
+      } else {
+        return false;
+      }
+    } else if (e.keyCode === 27) {
+      this.showPlaceholder();
     } else if (e.ctrlKey && $.inArray(e.keyCode, [66, 73, 85]) > -1) {
       // Ignore Hallo shortcuts (^B, ^I, ^U)
       e.stopPropagation();
@@ -56,9 +68,12 @@ var ArticleBody = React.createClass({
 
   onKeyDown: function(e) {
     // Persist the data on CTRL+Enter
-    if (e.ctrlKey && e.keyCode === 13) {
-      $(this.getDOMNode()).hallo({editable: false});
+    var node = $(this.getDOMNode());
+    if (e.ctrlKey && e.keyCode === 13 && node.text()) {
+      node.hallo({editable: false});
       this.updateData();
+    } else if (e.keyCode === 27) {
+      this.showPlaceholder();
     }
   },
 
