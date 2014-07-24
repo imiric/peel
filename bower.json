@@ -4,7 +4,6 @@
   "dependencies": {
     "bootstrap-sass-official": "~3.2.0",
     "bourbon": "~4.0.1",
-    "domready": "~1.0.5",
     "hallo": "~1.0.4"
   },
   "overrides": {

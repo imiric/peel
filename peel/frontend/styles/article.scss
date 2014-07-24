@@ -4,6 +4,10 @@
     margin-bottom: 50px;
     position: relative;
 
+    .placeholder {
+        color: #ddd;
+    }
+
     .title {
         border-bottom: 1px solid #e5e5e5;
         > span {

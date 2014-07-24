@@ -12,3 +12,4 @@ class ArticleResource(ModelResource):
     class Meta:
         queryset = Article.objects.all()
         authorization = Authorization()
+        always_return_data = True

@@ -1,33 +1,23 @@
 /** @jsx React.DOM */
 
 var EventHandlerMixin = {
-  getInitialState: function() {
-    var state = {},
-        fn = this.props.fieldName;
-    state[fn] = this.props[fn];
-    return state;
-  },
-
-  componentDidUpdate: function() {
-    var node = this.getDOMNode(),
-        fn = this.props.fieldName,
-        data = {};
-    $(node).hallo({editable: false});
-    data[fn] = this.state[fn];
-    this.props.updateArticle(data, true);
-  },
-
   onBlur: function(event) {
     var html = this.getDOMNode().innerHTML,
         fn = this.props.fieldName,
-        state = {};
-    state[fn] = html;
-    this.setState(state);
+        data = {};
+    $(this.getDOMNode()).hallo({editable: false});
+    data[fn] = html;
+    this.props.updateArticle(data, true);
   },
 
   onMouseDown: function(event) {
     if (event.ctrlKey) {
-      $(this.getDOMNode()).hallo({editable: true});
+      var node = $(this.getDOMNode()),
+          innerNode = node.children(':first');
+      if (innerNode.hasClass('placeholder')) {
+        innerNode.html('');
+      }
+      node.hallo({editable: true});
     }
   },
 };
@@ -46,9 +36,10 @@ var ArticleTitle = React.createClass({
   },
 
   render: function() {
+    var title = this.props.title || '<i class="placeholder">Add title</i>';
     return (
       <span onBlur={this.onBlur} onMouseDown={this.onMouseDown}
-        dangerouslySetInnerHTML={{__html: this.state['title']}} />
+        dangerouslySetInnerHTML={{__html: title}} />
     );
   }
 })
@@ -56,26 +47,45 @@ var ArticleTitle = React.createClass({
 var ArticleBody = React.createClass({
   mixins: [EventHandlerMixin],
   render: function() {
+    var body = this.props.content || '<i class="placeholder">Add body</i>';
     return (
       <div className="article-body" onBlur={this.onBlur} onMouseDown={this.onMouseDown}
-        dangerouslySetInnerHTML={{__html: this.state['content']}} />
+        dangerouslySetInnerHTML={{__html: body}} />
     );
   }
 });
 
 var Article = React.createClass({
+  getDefaultProps: function() {
+    return {id: '', title: '', content: '', tags: [], created_at: '', updated_at: ''};
+  },
+
   updateArticle: function(data, partial) {
-    var url = '/api/v1/article/' + this.props.id + '/';
-    // PATCH is forbidden on GAE, so use POST and a special header so
-    // Tastypie will interpret it as a partial update.
-    $.ajax({
-      url: url,
-      type: 'POST',
-      accepts: 'application/json',
-      contentType: 'application/json',
-      headers: partial ? {'X-HTTP-Method-Override': 'PATCH'} : {},
-      data: JSON.stringify(data)
-    });
+    var url = '/api/v1/article/',
+        reqOpts = {
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify(data),
+          dataType: 'json'
+        };
+
+    var id = this.props.id;
+
+    if (id) {
+      // The article already exists, so just update it.
+      url = url + id + '/';
+      // PATCH is forbidden on GAE, so use POST and a special header so
+      // Tastypie will interpret it as a partial update.
+      reqOpts.headers = partial ? {'X-HTTP-Method-Override': 'PATCH'} : {};
+    }
+
+    reqOpts.url = url;
+
+    $.ajax(reqOpts)
+      .done(function(response) {
+        response.key = id;
+        this.props.updateArticleState(response);
+      }.bind(this));
   },
 
   render: function() {
@@ -85,7 +95,7 @@ var Article = React.createClass({
     });
     return (
       <div className="article">
-        <div className="date pull-right">{this.props.created_at}</div>
+        <div className="date pull-right" title={this.props.updated_at}>{this.props.created_at}</div>
         <h3 className="title">
           <ArticleTitle updateArticle={this.updateArticle} fieldName="title" title={this.props.title} />
           <ul className="tags">{tags}</ul>
@@ -97,31 +107,103 @@ var Article = React.createClass({
 });
 
 var ArticleList = React.createClass({
+  render: function() {
+    var articles = this.props.articles.map(function(article, i) {
+      return <Article key={article.id} id={article.id} title={article.title}
+                    content={article.content} tags={article.tags}
+                    created_at={article.created_at}
+                    updated_at={article.updated_at}
+                    updateArticleState={this.props.updateArticleState}
+                  />;
+    }.bind(this));
+    return <div id="articles">{articles}</div>;
+  }
+});
+
+var AddArticleButton = React.createClass({
+  componentDidMount: function() {
+    $(this.getDOMNode()).tooltip();
+  },
+
+  onClick: function() {
+    this.props.updateArticleState({});
+  },
+
+  render: function() {
+    return (
+      <button type="button" className="btn btn-primary" onClick={this.onClick}
+          data-toggle="tooltip" data-placement="top" title="Add a new article">
+        <span className="glyphicon glyphicon-plus"></span>
+      </button>
+    );
+  }
+});
+
+var Content = React.createClass({
   getInitialState: function() {
     return {articles: []};
   },
 
   componentDidMount: function() {
-    $.get(this.props.source, function(result) {
-      if (this.isMounted()) {
-        this.setState({articles: result.objects});
-      }
+    $.get(this.props.articleSource, function(result) {
+      this.setState({articles: result.objects});
     }.bind(this));
   },
 
+  /**
+   * Update an article that already exists in the backend.
+   */
+  updateExistingArticle: function(articles, articleData) {
+    for (var i=0; i < articles.length; i++) {
+      if (articleData.key == articles[i].id) {
+        articles[i] = articleData;
+        break;
+      }
+    }
+  },
+
+  /**
+   * Update or create a placeholder article.
+   */
+  updatePlaceholderArticle: function(articles, articleData) {
+    if ($.isEmptyObject(articleData)) {
+      if (articles[0] !== undefined && $.isEmptyObject(articles[0])) {
+        return;
+      }
+      // Add a new placeholder article
+      articles.splice(0, 0, articleData);
+    } else {
+      if ($.isEmptyObject(articles[0])) {
+        // Update an existing placeholder article
+        articles[0] = articleData;
+      }
+    }
+  },
+
+  updateArticleState: function(data) {
+    if (this.isMounted()) {
+      var articles = this.state.articles;
+      if (data.key) {
+        this.updateExistingArticle(articles, data);
+      } else {
+        this.updatePlaceholderArticle(articles, data);
+      }
+      this.setState({articles: articles})
+    }
+  },
+
   render: function() {
-    var articles = [];
-    this.state.articles.forEach(function(article) {
-      articles.push(<Article id={article.id} title={article.title}
-                    content={article.content} tags={article.tags}
-                    created_at={article.created_at} />);
-    });
     return (
       <div>
-        {articles}
+        <div className="row" data-js="header">
+          <div className="col-lg-12 text-center">
+            <AddArticleButton updateArticleState={this.updateArticleState} />
+          </div>
+        </div>
+        <ArticleList articles={this.state.articles} updateArticleState={this.updateArticleState} />
       </div>
     );
   }
 });
 
-React.renderComponent(<ArticleList source="/api/v1/article/" />, document.getElementById("articles"));
+React.renderComponent(<Content articleSource="/api/v1/article" />, document.getElementById('content'));
