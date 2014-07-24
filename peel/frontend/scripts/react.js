@@ -1,6 +1,15 @@
 /** @jsx React.DOM */
 
 var EventHandlerMixin = {
+  componentDidMount: function() {
+    var node = $(this.getDOMNode()),
+        fn = this.props.fieldName;
+    node.hallo({placeholder: 'Add ' + fn});
+    // Leave the content in editable mode, just disable it. Needed to show
+    // the placeholder properly.
+    node.data('IKS-hallo').disable();
+  },
+
   onBlur: function(event) {
     var html = this.getDOMNode().innerHTML,
         fn = this.props.fieldName,
@@ -12,12 +21,7 @@ var EventHandlerMixin = {
 
   onMouseDown: function(event) {
     if (event.ctrlKey) {
-      var node = $(this.getDOMNode()),
-          innerNode = node.children(':first');
-      if (innerNode.hasClass('placeholder')) {
-        innerNode.html('');
-      }
-      node.hallo({editable: true});
+      $(this.getDOMNode()).hallo({editable: true});
     }
   },
 };
@@ -37,10 +41,9 @@ var ArticleTitle = React.createClass({
   },
 
   render: function() {
-    var title = this.props.title || '<i class="placeholder">Add title</i>';
     return (
       <span onBlur={this.onBlur} onMouseDown={this.onMouseDown}
-        onKeyDown={this.onKeyDown} dangerouslySetInnerHTML={{__html: title}} />
+        onKeyDown={this.onKeyDown} dangerouslySetInnerHTML={{__html: this.props.title}} />
     );
   }
 });
@@ -48,10 +51,9 @@ var ArticleTitle = React.createClass({
 var ArticleBody = React.createClass({
   mixins: [EventHandlerMixin],
   render: function() {
-    var body = this.props.content || '<i class="placeholder">Add body</i>';
     return (
       <div className="article-body" onBlur={this.onBlur} onMouseDown={this.onMouseDown}
-        dangerouslySetInnerHTML={{__html: body}} />
+        dangerouslySetInnerHTML={{__html: this.props.content}} />
     );
   }
 });
