@@ -50,10 +50,18 @@ var ArticleTitle = React.createClass({
 
 var ArticleBody = React.createClass({
   mixins: [EventHandlerMixin],
+
+  onKeyDown: function(e) {
+    // Persist the data on CTRL+Enter
+    if (e.ctrlKey && e.keyCode === 13) {
+      $(this.getDOMNode()).hallo({editable: false});
+    }
+  },
+
   render: function() {
     return (
       <div className="article-body" onBlur={this.onBlur} onMouseDown={this.onMouseDown}
-        dangerouslySetInnerHTML={{__html: this.props.body}} />
+        onKeyDown={this.onKeyDown} dangerouslySetInnerHTML={{__html: this.props.body}} />
     );
   }
 });
