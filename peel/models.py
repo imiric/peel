@@ -15,7 +15,7 @@ class Article(models.Model):
 
     author = models.ForeignKey(User, null=True, blank=True)
     title = models.CharField(max_length=512)
-    content = models.TextField()
+    body = models.TextField()
     tags = ListField()
     status = models.IntegerField(choices=STATUS_CHOICES, default=EDITING)
     created_at = models.DateTimeField(auto_now_add=True)

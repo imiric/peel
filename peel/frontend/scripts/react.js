@@ -53,14 +53,14 @@ var ArticleBody = React.createClass({
   render: function() {
     return (
       <div className="article-body" onBlur={this.onBlur} onMouseDown={this.onMouseDown}
-        dangerouslySetInnerHTML={{__html: this.props.content}} />
+        dangerouslySetInnerHTML={{__html: this.props.body}} />
     );
   }
 });
 
 var Article = React.createClass({
   getDefaultProps: function() {
-    return {id: '', title: '', content: '', tags: [], created_at: '', updated_at: ''};
+    return {id: '', title: '', body: '', tags: [], created_at: '', updated_at: ''};
   },
 
   updateArticle: function(data, partial) {
@@ -103,7 +103,7 @@ var Article = React.createClass({
           <ArticleTitle updateArticle={this.updateArticle} fieldName="title" title={this.props.title} />
           <ul className="tags">{tags}</ul>
         </h3>
-        <ArticleBody updateArticle={this.updateArticle} fieldName="content" content={this.props.content} />
+        <ArticleBody updateArticle={this.updateArticle} fieldName="body" body={this.props.body} />
       </div>
     );
   }
@@ -113,7 +113,7 @@ var ArticleList = React.createClass({
   render: function() {
     var articles = this.props.articles.map(function(article, i) {
       return <Article key={article.id} id={article.id} title={article.title}
-                    content={article.content} tags={article.tags}
+                    body={article.body} tags={article.tags}
                     created_at={article.created_at}
                     updated_at={article.updated_at}
                     updateArticleState={this.props.updateArticleState}
