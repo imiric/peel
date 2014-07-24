@@ -10,6 +10,6 @@ class ArticleResource(ModelResource):
         return bundle.obj.tags
 
     class Meta:
-        queryset = Article.objects.all()
+        queryset = Article.objects.order_by('-created_at')
         authorization = Authorization()
         always_return_data = True
