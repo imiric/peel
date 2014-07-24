@@ -10,7 +10,7 @@ var EventHandlerMixin = {
     node.data('IKS-hallo').disable();
   },
 
-  onBlur: function(event) {
+  updateData: function() {
     var html = this.getDOMNode().innerHTML,
         fn = this.props.fieldName,
         data = {};
@@ -33,6 +33,7 @@ var ArticleTitle = React.createClass({
     // Persist the data on Enter
     if (e.keyCode === 13) {
       $(this.getDOMNode()).hallo({editable: false});
+      this.updateData();
     } else if (e.ctrlKey && $.inArray(e.keyCode, [66, 73, 85]) > -1) {
       // Ignore Hallo shortcuts (^B, ^I, ^U)
       e.stopPropagation();
@@ -55,6 +56,7 @@ var ArticleBody = React.createClass({
     // Persist the data on CTRL+Enter
     if (e.ctrlKey && e.keyCode === 13) {
       $(this.getDOMNode()).hallo({editable: false});
+      this.updateData();
     }
   },
 
