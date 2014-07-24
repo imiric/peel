@@ -25,24 +25,25 @@ var EventHandlerMixin = {
 var ArticleTitle = React.createClass({
   mixins: [EventHandlerMixin],
 
-  componentDidMount: function() {
-    $(this.getDOMNode()).on('hallomodified', this.onHalloModified);
-  },
-
-  onHalloModified: function(event) {
-    var node = this.getDOMNode();
-    // TODO: Figure out a better workaround to avoid rich formatting.
-    node.innerHTML = node.innerText;
+  onKeyDown: function(e) {
+    // Persist the data on Enter
+    if (e.keyCode === 13) {
+      $(this.getDOMNode()).hallo({editable: false});
+    } else if (e.ctrlKey && $.inArray(e.keyCode, [66, 73, 85]) > -1) {
+      // Ignore Hallo shortcuts (^B, ^I, ^U)
+      e.stopPropagation();
+      return false;
+    }
   },
 
   render: function() {
     var title = this.props.title || '<i class="placeholder">Add title</i>';
     return (
       <span onBlur={this.onBlur} onMouseDown={this.onMouseDown}
-        dangerouslySetInnerHTML={{__html: title}} />
+        onKeyDown={this.onKeyDown} dangerouslySetInnerHTML={{__html: title}} />
     );
   }
-})
+});
 
 var ArticleBody = React.createClass({
   mixins: [EventHandlerMixin],
