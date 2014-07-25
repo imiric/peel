@@ -179,6 +179,32 @@ var ArticleDate = React.createClass({
 });
 
 var ArticleSettings = React.createClass({
+  componentDidMount: function() {
+    $(this.getDOMNode()).find('[data-toggle="tooltip"]').tooltip();
+  },
+
+  tooltipText: function(stat) {
+    var texts = {
+      1: 'Unpublished',
+      2: 'Published',
+      3: 'Deleted'
+    }
+    return texts[stat] || 'Delete?';
+  },
+
+  /**
+   * Updates the tooltip in-place.
+   */
+  setTooltipText: function(stat) {
+    var className = (stat == 1 || stat == 2) ? '.published' : '.delete',
+        node = $(this.getDOMNode()).find(className),
+        newText = this.tooltipText(stat);
+    node.tooltip('fixTitle')
+        .data('bs.tooltip')
+        .$tip.find('.tooltip-inner')
+        .text(newText);
+  },
+
   setArticleStatus: function(e) {
     e.stopPropagation();
     var published = $(e.target).closest('.published'),
@@ -187,6 +213,7 @@ var ArticleSettings = React.createClass({
       return;
     }
     this.props.updateArticle({id: this.props.id, status: newStatus}, true);
+    this.setTooltipText(newStatus);
     return false;
   },
 
@@ -196,10 +223,12 @@ var ArticleSettings = React.createClass({
     }
     return (
     <div className='article-settings'>
-      <a className='published' onClick={this.setArticleStatus} href='#'>
+      <a className='published' data-original-title={this.tooltipText(this.props.status == 1 ? 1 : 2)}
+          data-toggle='tooltip' data-placement='right' onClick={this.setArticleStatus} href='#'>
         <span className={'glyphicon glyphicon-eye-' + (this.props.status == 1 ? 'close' : 'open')}></span>
       </a>
-      <a className='delete' onClick={this.setArticleStatus} href='#'>
+      <a className='delete' data-original-title={this.tooltipText(this.props.status == 3 ? 3 : 4)}
+          data-toggle='tooltip' data-placement='right' onClick={this.setArticleStatus} href='#'>
         <span className='glyphicon glyphicon-remove-circle'></span>
       </a>
     </div>

@@ -47,6 +47,21 @@
             }
         }
 
+        .tooltip {
+            // Override some Bootstrap tooltip styles, because the settings
+            // popout messes them up.
+            &.in {
+                opacity: 0.9;
+            }
+            &.fade.in {
+                opacity: 1;
+            }
+            opacity: 0;
+            width: auto;
+            .tooltip-arrow {
+                left: -5px;
+            }
+        }
     }
 }
 
@@ -92,6 +107,7 @@
         }
         &:hover .glyphicon {
             opacity: 1;
+            cursor: default;
         }
     }
 
