@@ -191,6 +191,9 @@ var ArticleSettings = React.createClass({
   },
 
   render: function() {
+    if (!this.props.id) {
+      return null;
+    }
     return (
     <div className='article-settings'>
       <a className='published' onClick={this.setArticleStatus} href='#'>
