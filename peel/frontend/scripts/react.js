@@ -171,7 +171,7 @@ var ArticleDate = React.createClass({
     }
     return (
       <div className="date pull-right">
-        <span title={created.local().format()}>{created.fromNow()}</span>
+        <span className={updatedObj ? 'changed' : ''} title={created.local().format()}>{created.fromNow()}</span>
         {updatedObj}
       </div>
     );

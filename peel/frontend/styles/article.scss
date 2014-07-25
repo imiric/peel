@@ -21,9 +21,21 @@
 
     .date {
         padding: 5px;
+        &:hover > span.changed {
+            right: 20px;
+        }
+        &>span {
+            @include transition (right 0.5s);
+            position: absolute;
+            right: 5px;
+        }
         & .glyphicon {
+            @include transition (opacity 0.5s);
+            opacity: 0;
             color: orange;
-            opacity: 0.5;
+        }
+        &:hover .glyphicon {
+            opacity: 1;
         }
     }
 
