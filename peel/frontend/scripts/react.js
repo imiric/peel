@@ -26,7 +26,7 @@ var EventHandlerMixin = {
     var node = $(this.getDOMNode()),
         value = node.html(),
         fn = this.props.fieldName,
-        data = {};
+        data = {id: this.props.id};
     if (value) {
       if (fn == 'tag') {
         var tags = this.props.tags.slice(),
@@ -132,7 +132,7 @@ var ArticleTags = React.createClass({
       return (
         <li key={tag ? tag : Math.random()} className={tag ? '' : 'placeholder'}>
           <a href="#">
-            <ArticleTag tag={tag} updateArticle={this.props.updateArticle}
+            <ArticleTag tag={tag} id={this.props.id} updateArticle={this.props.updateArticle}
                 tags={this.props.tags} fieldName="tag"
             />
           </a>
@@ -179,11 +179,26 @@ var ArticleDate = React.createClass({
 });
 
 var ArticleSettings = React.createClass({
+  setArticleStatus: function(e) {
+    e.stopPropagation();
+    var published = $(e.target).closest('.published'),
+        newStatus = published.length ? (this.props.status == 1 ? 2 : 1) : 3;
+    if (newStatus == this.props.status) {
+      return;
+    }
+    this.props.updateArticle({id: this.props.id, status: newStatus}, true);
+    return false;
+  },
+
   render: function() {
     return (
     <div className='article-settings'>
-      <a className='published' href='#'><span className='glyphicon glyphicon-eye-open'></span></a>
-      <a className='delete' href='#'><span className='glyphicon glyphicon-remove-circle'></span></a>
+      <a className='published' onClick={this.setArticleStatus} href='#'>
+        <span className={'glyphicon glyphicon-eye-' + (this.props.status == 1 ? 'close' : 'open')}></span>
+      </a>
+      <a className='delete' onClick={this.setArticleStatus} href='#'>
+        <span className='glyphicon glyphicon-remove-circle'></span>
+      </a>
     </div>
     );
   }
@@ -192,34 +207,6 @@ var ArticleSettings = React.createClass({
 var Article = React.createClass({
   getDefaultProps: function() {
     return {id: '', title: '', body: '', tags: [], created_at: '', updated_at: ''};
-  },
-
-  updateArticle: function(data, partial) {
-    var url = '/api/v1/article/',
-        reqOpts = {
-          type: 'POST',
-          contentType: 'application/json',
-          data: JSON.stringify(data),
-          dataType: 'json'
-        };
-
-    var id = this.props.id;
-
-    if (id) {
-      // The article already exists, so just update it.
-      url = url + id + '/';
-      // PATCH is forbidden on GAE, so use POST and a special header so
-      // Tastypie will interpret it as a partial update.
-      reqOpts.headers = partial ? {'X-HTTP-Method-Override': 'PATCH'} : {};
-    }
-
-    reqOpts.url = url;
-
-    $.ajax(reqOpts)
-      .done(function(response) {
-        response.key = id;
-        this.props.updateArticleState(response);
-      }.bind(this));
   },
 
   render: function() {
@@ -231,16 +218,48 @@ var Article = React.createClass({
       <div className="article">
         <ArticleDate created_at={this.props.created_at} updated_at={this.props.updated_at} />
         <h3 className="title">
-          <ArticleTitle updateArticle={this.updateArticle} fieldName="title" title={this.props.title} />
-          <ArticleTags updateArticle={this.updateArticle} fieldName="tags" tags={this.props.tags} />
+          <ArticleTitle id={this.props.id} updateArticle={this.props.updateArticle}
+            fieldName="title" title={this.props.title} />
+          <ArticleTags id={this.props.id} updateArticle={this.props.updateArticle}
+            fieldName="tags" tags={this.props.tags} />
         </h3>
-        <ArticleBody updateArticle={this.updateArticle} fieldName="body" body={this.props.body} />
+        <ArticleBody id={this.props.id} updateArticle={this.props.updateArticle}
+          fieldName="body" body={this.props.body} />
       </div>
     );
   }
 });
 
 var ArticleList = React.createClass({
+  updateArticle: function(data, partial) {
+    var url = '/api/v1/article/',
+        reqOpts = {
+          type: 'POST',
+          contentType: 'application/json',
+          dataType: 'json'
+        };
+
+    var id = data['id'];
+    delete data['id'];
+
+    if (id) {
+      // The article already exists, so just update it.
+      url = url + id + '/';
+      // PATCH is forbidden on GAE, so use POST and a special header so
+      // Tastypie will interpret it as a partial update.
+      reqOpts.headers = partial ? {'X-HTTP-Method-Override': 'PATCH'} : {};
+    }
+
+    reqOpts.url = url;
+    reqOpts.data = JSON.stringify(data),
+
+    $.ajax(reqOpts)
+      .done(function(response) {
+        response.key = id;
+        this.props.updateArticleState(response);
+      }.bind(this));
+  },
+
   render: function() {
     var articles = this.props.articles.map(function(article, i) {
       return (
@@ -249,9 +268,11 @@ var ArticleList = React.createClass({
             body={article.body} tags={article.tags}
             created_at={article.created_at}
             updated_at={article.updated_at}
-            updateArticleState={this.props.updateArticleState}
+            updateArticle={this.updateArticle}
           />
-          <ArticleSettings />
+          <ArticleSettings id={article.id}
+            status={article.status}
+            updateArticle={this.updateArticle}/>
         </div>
       );
     }.bind(this));
