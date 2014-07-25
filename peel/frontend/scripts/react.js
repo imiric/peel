@@ -178,6 +178,17 @@ var ArticleDate = React.createClass({
   }
 });
 
+var ArticleSettings = React.createClass({
+  render: function() {
+    return (
+    <div className='article-settings'>
+      <a className='published' href='#'><span className='glyphicon glyphicon-eye-open'></span></a>
+      <a className='delete' href='#'><span className='glyphicon glyphicon-remove-circle'></span></a>
+    </div>
+    );
+  }
+});
+
 var Article = React.createClass({
   getDefaultProps: function() {
     return {id: '', title: '', body: '', tags: [], created_at: '', updated_at: ''};
@@ -232,12 +243,17 @@ var Article = React.createClass({
 var ArticleList = React.createClass({
   render: function() {
     var articles = this.props.articles.map(function(article, i) {
-      return <Article key={article.id} id={article.id} title={article.title}
-                    body={article.body} tags={article.tags}
-                    created_at={article.created_at}
-                    updated_at={article.updated_at}
-                    updateArticleState={this.props.updateArticleState}
-                  />;
+      return (
+        <div className='article-wrapper'>
+          <Article key={article.id} id={article.id} title={article.title}
+            body={article.body} tags={article.tags}
+            created_at={article.created_at}
+            updated_at={article.updated_at}
+            updateArticleState={this.props.updateArticleState}
+          />
+          <ArticleSettings />
+        </div>
+      );
     }.bind(this));
     return <div id="articles">{articles}</div>;
   }

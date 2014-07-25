@@ -1,8 +1,60 @@
 @import "bourbon/dist/_bourbon";
 
+#articles {
+    .article-wrapper {
+        position: relative;
+        &:hover > .article-settings {
+            right: -30px;
+        }
+    }
+
+    .article-settings {
+        position: absolute;
+        top: 5px;
+        right: -5px;
+        width: 35px;
+        border: 1px rgba(50, 50, 50, 0.2) solid;
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+        @include transition (right 1s cubic-bezier(0.075, 0.820, 0.165, 1.000));
+
+        &:hover {
+            right: -30px;
+        }
+
+        .published {
+            color: #2a6496;
+            border-top-right-radius: 5px;
+        }
+
+        .delete {
+            border-bottom-right-radius: 5px;
+            color: #c9302c;
+        }
+
+        &>* {
+            color: inherit;
+            opacity: 0.8;
+            text-decoration: none;
+            display: block;
+            padding: 5px 8px 5px 0;
+            float: right;
+            width: 100%;
+            text-align: right;
+
+            &:hover {
+                opacity: 1;
+            }
+        }
+
+    }
+}
+
 .article {
     margin-bottom: 50px;
     position: relative;
+    background: white;
+    z-index: 5;
 
     .inPlaceholderMode {
         color: #ddd;
@@ -17,6 +69,10 @@
         .inner-title {
             display: inline-block;
         }
+    }
+
+    .article-body {
+        min-height: 50px;
     }
 
     .date {
