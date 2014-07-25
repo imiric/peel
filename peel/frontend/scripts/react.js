@@ -1,5 +1,7 @@
 /** @jsx React.DOM */
 
+var moment = require('moment');
+
 var EventHandlerMixin = {
   componentDidMount: function() {
     var fn = this.props.fieldName;
@@ -141,6 +143,41 @@ var ArticleTags = React.createClass({
   }
 });
 
+var ArticleDate = React.createClass({
+  componentDidMount: function() {
+    setInterval(this.update, 30000);
+  },
+
+  update: function() {
+    if (this.isMounted()) {
+      this.forceUpdate();
+    }
+  },
+
+  render: function() {
+    if (!this.props.created_at) {
+      return <span></span>;
+    }
+    var created = moment.utc(this.props.created_at),
+        updated = moment.utc(this.props.updated_at),
+        updatedObj = null;
+
+    if (!created.isSame(updated, 'minute')) {
+      updatedObj = (
+        <small>&nbsp;
+          <span className="glyphicon glyphicon-flash" title={'Updated ' + updated.fromNow()} />
+        </small>
+      );
+    }
+    return (
+      <div className="date pull-right">
+        <span title={created.local().format()}>{created.fromNow()}</span>
+        {updatedObj}
+      </div>
+    );
+  }
+});
+
 var Article = React.createClass({
   getDefaultProps: function() {
     return {id: '', title: '', body: '', tags: [], created_at: '', updated_at: ''};
@@ -181,7 +218,7 @@ var Article = React.createClass({
     });
     return (
       <div className="article">
-        <div className="date pull-right" title={this.props.updated_at}>{this.props.created_at}</div>
+        <ArticleDate created_at={this.props.created_at} updated_at={this.props.updated_at} />
         <h3 className="title">
           <ArticleTitle updateArticle={this.updateArticle} fieldName="title" title={this.props.title} />
           <ArticleTags updateArticle={this.updateArticle} fieldName="tags" tags={this.props.tags} />

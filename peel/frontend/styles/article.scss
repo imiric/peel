@@ -21,6 +21,10 @@
 
     .date {
         padding: 5px;
+        & .glyphicon {
+            color: orange;
+            opacity: 0.5;
+        }
     }
 
     .content {
