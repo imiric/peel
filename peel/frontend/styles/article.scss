@@ -3,8 +3,18 @@
 #articles {
     .article-wrapper {
         position: relative;
+        height: 120px;
+        opacity: 1;
+        @include transition (opacity 1s, height 1s);
+
         &:hover > .article-settings {
             right: -30px;
+        }
+
+        &.deleted {
+            height: 0;
+            opacity: 0;
+            overflow: hidden;
         }
     }
 

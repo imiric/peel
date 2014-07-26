@@ -216,8 +216,18 @@ var ArticleSettings = React.createClass({
     if (newStatus == this.props.status) {
       return;
     }
-    this.props.updateArticle({id: this.props.id, status: newStatus}, true);
+
+    var update = function() {
+        this.props.updateArticle({id: this.props.id, status: newStatus}, true);
+    }.bind(this);
+
     this.setTooltipText(newStatus);
+    if (newStatus === 3) {
+      $(this.getDOMNode()).closest('.article-wrapper').addClass('deleted');
+      setTimeout(update, 1000);
+    } else {
+      update();
+    }
     return false;
   },
 
@@ -249,7 +259,7 @@ var Article = React.createClass({
       tags.push(<li><a href="#">{tag}</a></li>);
     });
     return (
-      <div className="article">
+      <div className='article'>
         <ArticleDate created_at={this.props.created_at} updated_at={this.props.updated_at} />
         <h3 className="title">
           <ArticleTitle id={this.props.id} updateArticle={this.props.updateArticle}
@@ -259,6 +269,20 @@ var Article = React.createClass({
         </h3>
         <ArticleBody id={this.props.id} updateArticle={this.props.updateArticle}
           fieldName="body" body={this.props.body} />
+      </div>
+    );
+  }
+});
+
+var ArticleWrapper = React.createClass({
+  componentDidMount: function() {
+    $(this.getDOMNode()).removeClass('deleted');
+  },
+
+  render: function() {
+    return (
+      <div className={'article-wrapper' + (this.props.id ? '' : ' deleted')}>
+        {this.props.children}
       </div>
     );
   }
@@ -297,20 +321,20 @@ var ArticleList = React.createClass({
   render: function() {
     var articles = this.props.articles.map(function(article, i) {
       return (
-        <div className='article-wrapper'>
+        <ArticleWrapper key={article.id} id={article.id}>
           <Article key={article.id} id={article.id} title={article.title}
             body={article.body} tags={article.tags}
-            created_at={article.created_at}
-            updated_at={article.updated_at}
+            created_at={article.created_at} updated_at={article.updated_at}
             updateArticle={this.updateArticle}
           />
           <ArticleSettings id={article.id}
             status={article.status}
             updateArticle={this.updateArticle}/>
-        </div>
+        </ArticleWrapper>
       );
     }.bind(this));
     return <div id="articles">{articles}</div>;
+
   }
 });
 
@@ -348,11 +372,21 @@ var Content = React.createClass({
    * Update an article that already exists in the backend.
    */
   updateExistingArticle: function(articles, articleData) {
+    var deleteIndex = -1;
+
     for (var i=0; i < articles.length; i++) {
       if (articleData.key == articles[i].id) {
-        articles[i] = articleData;
+        if (articleData.status === 3) {
+          deleteIndex = i;
+        } else {
+          articles[i] = articleData;
+        }
         break;
       }
+    }
+
+    if (deleteIndex > -1) {
+      articles.splice(deleteIndex, 1);
     }
   },
 
