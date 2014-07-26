@@ -400,4 +400,5 @@ var Content = React.createClass({
   }
 });
 
-React.renderComponent(<Content articleSource="/api/v1/article" />, document.getElementById('content'));
+var sourceUrl = '/api/v1/article/?status__in=1,2&order_by=-created_at';
+React.renderComponent(<Content articleSource={sourceUrl} />, document.getElementById('content'));
