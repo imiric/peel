@@ -29,10 +29,7 @@ var EventHandlerMixin = {
         data = {id: this.props.id};
     if (value) {
       if (fn == 'tag') {
-        var tags = this.props.tags.slice(),
-            valExists = $.inArray(value, tags) > -1,
-            tagIdx = $.inArray(this.props.tag, tags);
-
+        var valExists = $.inArray(value, this.props.tags) > -1;
         if (valExists) {
           // Don't add an already existing tag
           if (this.props.tag) {
@@ -42,11 +39,8 @@ var EventHandlerMixin = {
           }
           return;
         }
-
-        // Either update an existing tag or append a new one
-        tags.splice(tagIdx > -1 ? tagIdx : tags.length, tagIdx > -1 ? 1 : 0, value);
-        value = tags;
-        fn = 'tags';
+        value = this.props.updateTagState(value, this.props.tag);
+        fn = 'tags'
       }
       data[fn] = value;
       this.props.updateArticle(data, true);
@@ -126,15 +120,54 @@ var ArticleTag = React.createClass({
 });
 
 var ArticleTags = React.createClass({
+  deleteTag: function(e) {
+    var tag = $(e.target).siblings('a').text(),
+        updatedTags = this.updateTagState(tag, null, true);
+
+    this.props.updateArticle({id: this.props.id, tags: updatedTags}, true);
+  },
+
+  /**
+   * Adds, edits or removes tags from the current state.
+   * It doesn't modify the current state, just returns a modified copy of it.
+   *
+   * TODO: Split this into several functions? Initially it made sense to keep
+   * this logic centralized, but I'm not so convinced.
+   *
+   * @param {String} newTag - The tag to add or delete.
+   * @param {String} targetTag - The tag that was clicked on, if any.
+   * @param {boolean} del - Whether to delete the tag or not.
+   * @return {Array} An array of tags representing the updated state.
+   */
+  updateTagState: function(newTag, targetTag, del) {
+    del = del === undefined ? false : del;
+    if (!targetTag) {
+      targetTag = newTag;
+    }
+    var tags = this.props.tags.slice(),
+        tagExists = $.inArray(newTag, tags) > -1,
+        targetIdx = $.inArray(targetTag, tags),
+        spliceArgs = [targetIdx > -1 ? targetIdx : tags.length, targetIdx > -1 ? 1 : 0];
+
+    if (!del) {
+      spliceArgs.push(newTag);
+    }
+
+    Array.prototype.splice.apply(tags, spliceArgs);
+    return tags;
+  },
+
   render: function() {
     var tags = this.props.tags.concat('');
     tags = tags.map(function(tag) {
       return (
         <li key={tag ? tag : Math.random()} className={tag ? '' : 'placeholder'}>
-          <span className='glyphicon glyphicon-remove-circle delete-tag'></span>
+          <span onClick={this.deleteTag} className='glyphicon glyphicon-remove-circle delete-tag'></span>
           <a href="#">
-            <ArticleTag tag={tag} id={this.props.id} updateArticle={this.props.updateArticle}
-                tags={this.props.tags} fieldName="tag"
+            <ArticleTag tag={tag} id={this.props.id}
+              updateArticle={this.props.updateArticle}
+              updateTagState={this.updateTagState}
+              tags={this.props.tags} fieldName="tag"
             />
           </a>
         </li>
