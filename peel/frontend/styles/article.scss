@@ -134,10 +134,26 @@
         padding-top: 5px;
         margin-bottom: 0;
 
+        .delete-tag {
+            display: none;
+            color: #c9302c;
+            position: absolute;
+            top: -5px;
+            right: 0;
+            z-index: 1;
+            cursor: pointer;
+            text-shadow: 1px 1px 2px #fff;
+
+        }
+
         li, a {
             position: relative;
             display: inline-block;
             margin-right: 5px;
+        }
+
+        li:not(.placeholder):hover > .delete-tag {
+            display: block;
         }
 
         li.placeholder {

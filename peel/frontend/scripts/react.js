@@ -131,6 +131,7 @@ var ArticleTags = React.createClass({
     tags = tags.map(function(tag) {
       return (
         <li key={tag ? tag : Math.random()} className={tag ? '' : 'placeholder'}>
+          <span className='glyphicon glyphicon-remove-circle delete-tag'></span>
           <a href="#">
             <ArticleTag tag={tag} id={this.props.id} updateArticle={this.props.updateArticle}
                 tags={this.props.tags} fieldName="tag"
