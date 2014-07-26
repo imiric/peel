@@ -48,6 +48,12 @@ class ArticleResource(ModelResource):
         return objects
 
     class Meta:
-        queryset = Article.objects.order_by('-created_at')
+        queryset = Article.objects.all()
+        ordering = ['created_at', 'updated_at']
+        filtering = {
+            'status': ('exact', 'ne'),
+            'created_at': ('lt', 'gt'),
+            'updated_at': ('lt', 'gt'),
+        }
         authorization = Authorization()
         always_return_data = True
