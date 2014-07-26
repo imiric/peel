@@ -179,6 +179,10 @@ var ArticleDate = React.createClass({
 });
 
 var ArticleSettings = React.createClass({
+  getDefaultProps: function() {
+    return {status: 1};
+  },
+
   componentDidMount: function() {
     $(this.getDOMNode()).find('[data-toggle="tooltip"]').tooltip();
   },
@@ -218,11 +222,9 @@ var ArticleSettings = React.createClass({
   },
 
   render: function() {
-    if (!this.props.id) {
-      return null;
-    }
+    var style = {display: 'none'};
     return (
-    <div className='article-settings'>
+    <div className='article-settings' style={this.props.id ? {} : style}>
       <a className='published' data-original-title={this.tooltipText(this.props.status == 1 ? 1 : 2)}
           data-toggle='tooltip' data-placement='right' onClick={this.setArticleStatus} href='#'>
         <span className={'glyphicon glyphicon-eye-' + (this.props.status == 1 ? 'close' : 'open')}></span>
@@ -238,7 +240,7 @@ var ArticleSettings = React.createClass({
 
 var Article = React.createClass({
   getDefaultProps: function() {
-    return {id: '', title: '', body: '', tags: [], created_at: '', updated_at: ''};
+    return {id: '', title: '', body: '', status: 1, tags: [], created_at: '', updated_at: ''};
   },
 
   render: function() {
