@@ -19,6 +19,13 @@ runs on Google App Engine, but through the use of
 it can easily be adapted to other platforms.
 
 
+Demo
+----
+
+You can view a demo of the app [here](http://peel-demo.appspot.com/). If it's
+down, then the free quota has run out, so try again tomorrow.
+
+
 Usage
 -----
 
